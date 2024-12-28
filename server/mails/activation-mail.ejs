@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Assesment System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #0070f3 0%, #00c6ff 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .email-header h1 {
+            color: #ffffff;
+            font-size: 28px;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .email-body {
+            padding: 40px 30px;
+            color: #333333;
+        }
+        .email-body p {
+            margin-bottom: 20px;
+        }
+        .activation-code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #0070f3;
+            text-align: center;
+            letter-spacing: 5px;
+            margin: 30px 0;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 8px;
+        }
+        .email-footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666666;
+        }
+        .email-footer a {
+            color: #0070f3;
+            text-decoration: none;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #0070f3;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-header">
+            <h1>Welcome to Online Assesment System</h1>
+        </div>
+        <div class="email-body">
+            <p>Hello <%= user.name %>,</p>
+            <p>Thank you for registering with Online Assesment System. To activate your account, please use the following activation code:</p>
+            <div class="activation-code"><%= activationCode %></div>
+            <p>Please enter this code on the activation page within the next 5 minutes.</p>
+            <p>If you did not register for an Online Assesment System account, please ignore this email.</p>
+            <a href="#" class="button">Activate Your Account</a>
+        </div>
+        <div class="email-footer">
+            <p>If you have any questions, please don't hesitate to contact us at <a href="mailto:niroshanieee@gmail.com">janithniroshan961@gmail.com</a></p>
+        </div>
+    </div>
+</body>
+</html>
