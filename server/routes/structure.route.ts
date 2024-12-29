@@ -11,27 +11,27 @@ import {
 import { checkStructureExists } from '../middleware/structure.middleware';
 import { isAuthenticated } from '../middleware/auth';
 
-const structurerouter = express.Router();
+const structureRouter = express.Router();
 
 // Create a new structure
-structurerouter.post('/create', isAuthenticated, createStructureController);
+structureRouter.post('/create-structure', isAuthenticated, createStructureController);
 
-// Get a structure by ID
-structurerouter.get('/:id', checkStructureExists, getStructureByIdController);
+// Get a structure by its ID
+structureRouter.get('/get-structure/:structureId', checkStructureExists, getStructureByIdController);
 
-// Update a structure by ID
-structurerouter.put('/:id', checkStructureExists, updateStructureController);
+// Update a structure by its ID
+structureRouter.put('/update-structure/:structureId', checkStructureExists, updateStructureController);
 
-// Delete a structure by ID
-structurerouter.delete('/:id', checkStructureExists, deleteStructureController);
+// Delete a structure by its ID
+structureRouter.delete('/delete-structure/:structureId', checkStructureExists, deleteStructureController);
 
-// Get all structures for a creator
-structurerouter.get('/creator/:creatorId', getAllStructuresController);
+// Get all structures for a specific creator
+structureRouter.get('/get-all-structures-by-creator/:creatorId', getAllStructuresController);
 
-// Add an item to a structure
-structurerouter.post('/:id/item', checkStructureExists, addStructureItemController);
+// Add a new item to a structure
+structureRouter.post('/add-structure-item/:structureId', checkStructureExists, addStructureItemController);
 
-// Get items of a structure
-structurerouter.get('/:id/items', checkStructureExists, getStructureItemsController);
+// Get all items of a specific structure
+structureRouter.get('/get-structure-items/:structureId', checkStructureExists, getStructureItemsController);
 
-export default structurerouter;
+export default structureRouter;
