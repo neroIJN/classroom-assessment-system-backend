@@ -31,26 +31,41 @@ export const generateExcelSheet = CatchAsyncError(
 
 
 
+import mongoose from "mongoose";
 
 export const downloadExcelSheet = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const assignmentId = req.params.assignmentId; // Assuming you have an assignmentId in the URL parameters
-            const results = await QuizSubmissionModel.find({ assignmentId: assignmentId }); // Query based on assignmentId
-            
+            const { assignmentId } = req.params;
+
+            // Validate if assignmentId is a valid ObjectId
+            if (!mongoose.Types.ObjectId.isValid(assignmentId)) {
+                return next(new ErrorHandler("Invalid assignmentId format", 400));
+            }
+
+            const results = await QuizSubmissionModel.find({ assignmentId });
+
             if (results.length > 0) {
                 const response = JSON.parse(JSON.stringify(results));
                 const workbook = xlsx.utils.book_new();
                 const worksheet = xlsx.utils.json_to_sheet(response);
-                xlsx.utils.book_append_sheet(workbook, worksheet, 'Users');
-                
+                xlsx.utils.book_append_sheet(workbook, worksheet, "Users");
+
                 // Create a buffer for the Excel file
-                const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+                const excelBuffer = xlsx.write(workbook, {
+                    bookType: "xlsx",
+                    type: "buffer",
+                });
 
                 // Set headers for file download
-                res.setHeader('Content-Disposition', 'attachment; filename=resultSheet.xlsx');
-                res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
+                res.setHeader(
+                    "Content-Disposition",
+                    "attachment; filename=resultSheet.xlsx"
+                );
+                res.setHeader(
+                    "Content-Type",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                );
 
                 // Send the Excel file as a response
                 res.send(excelBuffer);
@@ -62,3 +77,4 @@ export const downloadExcelSheet = CatchAsyncError(
         }
     }
 );
+

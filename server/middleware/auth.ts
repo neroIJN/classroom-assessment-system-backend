@@ -1,6 +1,6 @@
 import { Request,Response, NextFunction } from "express";
 import { CatchAsyncError } from "./catchAsyncError";
-import ErrorHandler from "../utils/ErrorHandler";
+import {ErrorHandler} from "../utils/ErrorHandler";
 import jwt, { JwtPayload } from "jsonwebtoken";
 // import {updateAccessToken} from "../controllers/user.controller"
 import { redis } from "../utils/redis";

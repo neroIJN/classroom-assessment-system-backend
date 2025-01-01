@@ -112,7 +112,6 @@ userAdminRouter.post(
 userAdminRouter.get(
   '/downloadExcel/:assignmentId',
   isAuthenticated,
-  
   downloadExcelSheet
 );
 

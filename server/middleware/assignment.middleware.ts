@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import AssignmentModel from '../models/mcq.model';
-import ErrorHandler from "../utils/ErrorHandler";
+import {ErrorHandler} from "../utils/ErrorHandler";
 
 export const checkAssignmentExists = async (req: Request, res: Response, next: NextFunction) => {
   try {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import StructureModel from "../models/structure.model"; // Adjust the path to match your folder structure
-import ErrorHandler from "../utils/ErrorHandler";
+import {ErrorHandler} from "../utils/ErrorHandler";
 
 // Middleware to check if a structure exists by ID
 export const checkStructureExists = async (req: Request, res: Response, next: NextFunction) => {
