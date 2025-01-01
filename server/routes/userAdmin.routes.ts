@@ -106,13 +106,13 @@ userAdminRouter.post(
 userAdminRouter.post(
   '/ExportToExcel',
   isAuthenticated,
-  authorizeRoles('admin'),
+  
   generateExcelSheet
 );
 userAdminRouter.get(
   '/downloadExcel/:assignmentId',
   isAuthenticated,
-  authorizeRoles('admin'),
+  
   downloadExcelSheet
 );
 
