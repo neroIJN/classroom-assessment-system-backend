@@ -13,7 +13,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 app.use(cors({
-    origin: ['http://localhost:4000', 'http://localhost:4001'], // Allow requests from localhost:3000
+    origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow requests from localhost:3000
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // If you're using cookies or authentication
     allowedHeaders: ['Content-Type', 'Authorization'],
