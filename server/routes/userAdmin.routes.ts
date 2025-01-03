@@ -1,4 +1,4 @@
-import { downloadExcelSheet, generateExcelSheet, generateExcelSheet1 } from './../controllers/resultGenerator.controller';
+import { downloadExcelSheet, downloadFullExcelSheet } from './../controllers/resultGenerator.controller';
 import express from 'express';
 import {
   createAssignmentController,
@@ -102,17 +102,5 @@ userAdminRouter.post(
   calculateScoreController
 );
 
-// Excel report generation and download
-userAdminRouter.post(
-  '/ExportToExcel',
-  isAuthenticated,
-  
-  generateExcelSheet
-);
-userAdminRouter.get(
-  '/downloadExcel/:assignmentId',
-  isAuthenticated,
-  downloadExcelSheet
-);
 
 export default userAdminRouter;
