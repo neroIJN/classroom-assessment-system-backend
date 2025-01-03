@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import userAdminRouter  from "./routes/userAdmin.routes"
 import userRouter from './routes/user.route';
 import router from './routes/assignment.route';
+import resultRouter from './routes/result.routes';
 import structurerouter from './routes/structure.route';
 import essayRouter from './routes/essay.route';
 
@@ -20,7 +21,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.use("/api/v1", userAdminRouter,userRouter,router,structurerouter,essayRouter);
+app.use("/api/v1", userAdminRouter,userRouter,router,structurerouter,essayRouter,resultRouter);
 //Testing API
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
