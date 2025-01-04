@@ -1,4 +1,8 @@
+import mongoose from "mongoose";
 import EssayAssignmentModel, {IEssay, IEssayAssignment} from "../models/essay.model";
+import EssaySubmissionModel, { IEssaySubmission } from "../models/essaySubmissionModel";
+import userModel from "../models/user.model";
+import axios from 'axios';
 
 
 /**
@@ -78,3 +82,108 @@ export const addEssayItem = async (
     } as IEssay);
     return await essay.save();
 };
+
+interface EssaySubmission {
+    assignmentId: string;
+    userId: string;
+    answers: { questionId: string; modelAnswer: string; studentAnswer: string }[];
+    startTime: Date;
+}
+
+/**
+ * Start an essay assignment
+ * @param assignmentId - Essay assignment ID
+ * @param userId - User ID
+ * @returns The essay assignment and start time
+ */
+export const startEssayAssignment = async (assignmentId: string, userId: string): Promise<{assignment: IEssayAssignment; startTime: Date; score: number}> => {
+    const assignment = await EssayAssignmentModel.findById(assignmentId);
+    if (!assignment) {
+        throw new Error('Assignment not found');
+    }
+
+    const startTime = new Date();
+    const score = 0;
+
+    return {assignment, startTime, score};
+}
+
+/**
+ * Submit an essay assignment
+ * @param submission - Essay submission data
+ * @returns The essay submission
+ */
+
+export const submitEssay = async (submission: EssaySubmission): Promise<IEssaySubmission> => {
+    const assignment = await EssayAssignmentModel.findById(submission.assignmentId);
+    if (!assignment) {
+        throw new Error('Assignment not found');
+    }
+
+    const user = await userModel.findById(submission.userId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    const registrationNumber = user.registrationNumber;
+
+    const endTime = new Date();
+    const timeTaken = (endTime.getTime() - submission.startTime.getTime()) / 60000;
+
+    let score = 0;
+    for (const answer of submission.answers) {
+        const question = assignment.questions.find(q => q._id && q._id.toString() === answer.questionId);
+        if (question) {
+        const response = await axios.post('https://sentence-similarity-pi.vercel.app/similarity', {
+            model_answer: answer.modelAnswer,
+            student_answer: answer.studentAnswer
+        });
+
+        score += response.data.similarity_score;
+        }
+    }
+
+    const essaySubmission = new EssaySubmissionModel({
+        assignmentId: new mongoose.Types.ObjectId(submission.assignmentId),
+        userId: new mongoose.Types.ObjectId(submission.userId),
+        registrationNumber,
+        answers: submission.answers.map(answer => ({
+            questionId: new mongoose.Types.ObjectId(answer.questionId),
+            modelAnswer: answer.modelAnswer,
+            studentAnswer: answer.studentAnswer
+        })),
+        score,
+        timeTaken,
+        submittedAt: endTime,
+    });
+
+    await essaySubmission.save();
+
+    return essaySubmission;
+};
+
+/**
+ * Get a specific essay submission
+ * @param submissionId - Essay submission ID
+ * @returns The essay submission, or null if not found
+ */
+export const getEssaySubmission = async (submissionId: string): Promise<IEssaySubmission | null> => {
+    return await EssaySubmissionModel.findById(submissionId);
+};
+
+/**
+ * Get all essay submissions for a specific user
+ * @param userId - User ID
+ * @returns A list of essay submissions
+ */
+export const getEssaySubmissionsByUser = async (userId: string): Promise<IEssaySubmission[]> => {
+    return await EssaySubmissionModel.find({userId});
+};
+
+/**
+ * Get all essay submissions for a specific assignment
+ * @param assignmentId - Assignment ID
+ * @returns A list of essay submissions
+ */
+export const getEssaySubmissionsByAssignment = async (assignmentId: string): Promise<IEssaySubmission[]> => {
+    return await EssaySubmissionModel.find({assignmentId});
+}

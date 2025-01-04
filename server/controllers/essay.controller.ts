@@ -6,6 +6,9 @@ import {
     deleteEssay,
     getAllEssays,
     addEssayItem,
+    startEssayAssignment,
+    submitEssay,
+    getEssaySubmissionsByAssignment,
   } from "../services/essay.service";
   import EssayAssignmentModel from "../models/essay.model";
 
@@ -91,4 +94,101 @@ export const addEssayItemController = async (req:Request, res:Response, next:Nex
     } catch (error) {
         next(error);
     }
+};
+
+// Start an  essay assignment
+export const startEssayAssignmentController = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const {assignment, startTime} = await startEssayAssignment(req.params.id, req.body.userId);
+    res.status(200).json({
+      success: true,
+      assignment,
+      startTime,
+    })
+    
+  } catch (error) {
+    next(error);    
+  }
+};
+
+// submit a essay assignment
+export const submitEssayAssignmentController = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const {userId, answers, startTime} = req.body;
+
+    if(!Array.isArray(answers)){
+      return res.status(400).json({
+        success: false,
+        message: "Answers must be an array",
+      });
+    }
+
+    const submission = {
+      assignmentId: req.params.id,
+      userId,
+      answers,
+      startTime: new Date(startTime),
+    };
+
+    const result = await submitEssay(submission);
+    res.status(200).json({
+      success: true,
+      submission: result,
+    });
+  } catch (error: any) {
+    console.error("Error in essay submission:", error);
+    if (error.message === "Time limit exceeded") {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }else{
+      next(error);
+    }   
+  }
+};
+
+// Get specific essay submission
+export const getEssaySubmissionController = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const submission = await EssayAssignmentModel.findById(req.params.submissionId);
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        message: "Submission not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      submission,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all essay submissions for a user
+export const getEssaySubmissionsByUserController = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const submissions = await EssayAssignmentModel.find({userId: req.params.userId});
+    res.status(200).json({
+      success: true,
+      submissions,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all essay submissions for an assignment
+export const getEssaySubmissionsByAssignmentController = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const submissions = await getEssaySubmissionsByAssignment(req.params.assignmentId);
+    res.status(200).json({
+      success: true,
+      submissions,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
