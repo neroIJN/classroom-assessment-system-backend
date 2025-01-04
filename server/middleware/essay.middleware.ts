@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import EssayAssignmentModel from "../models/essay.model"; // Adjust the path to match your folder structure
-import ErrorHandler from "../utils/ErrorHandler";
+import { ErrorHandler } from "../utils/ErrorHandler";
+// import ErrorHandler from "../utils/ErrorHandler";
 
 // Middleware to check if an essay assignment exists by ID
 export const checkEssayAssignmentExists = async (req: Request, res: Response, next: NextFunction) => {
