@@ -4,7 +4,7 @@ import userAdminModel, { IUser } from "../models/userAdmin.model";
 import { ErrorHandler } from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncError";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-import ejs, { Template } from "ejs";
+import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
 import {
@@ -20,27 +20,27 @@ interface IRegistrationBody {
     name: string;
     email: string;
     password: string;
-    avatar?: string;
+    avatar?: {
+        public_id: string;
+        url: string;
+    };
 }
 
 export const registrationUser = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, avatar } = req.body;
 
             const isEmailExist = await userAdminModel.findOne({ email });
             if (isEmailExist) {
                 return next(new ErrorHandler("Email already exists", 400));
             }
 
-
-
-
             const user: IRegistrationBody = {
                 name,
                 email,
                 password,
-
+                avatar
             };
 
             const activationToken = createActivationToken(user);
@@ -117,7 +117,7 @@ export const activateUser = CatchAsyncError(
                 return next(new ErrorHandler("Invalid activation code", 400));
             }
 
-            const { name, email, password } = newUser.user;
+            const { name, email, password, avatar } = newUser.user;
 
             const existUser = await userAdminModel.findOne({ email });
 
@@ -125,16 +125,19 @@ export const activateUser = CatchAsyncError(
                 return next(new ErrorHandler("Email already exists", 400));
             }
 
-
-
             const user = await userAdminModel.create({
                 name,
                 email,
                 password,
+                avatar,
+                role: "admin",
+                isVerified: true,
+                courses: []
             });
 
             res.status(201).json({
                 success: true,
+                message: "Account activated successfully"
             });
         } catch (error: any) {
             return next(new ErrorHandler(error.message, 400));
@@ -155,12 +158,12 @@ export const loginUser = CatchAsyncError(
 
             if (!email || !password) {
                 return next(
-                    new ErrorHandler("Please enter registration number and password", 400)
+                    new ErrorHandler("Please enter email and password", 400)
                 );
             }
 
             const user = await userAdminModel
-                .findOne({ email })
+                .findOne({ email, role: "admin" })
                 .select("+password");
 
             if (!user) {
@@ -189,10 +192,12 @@ export const logoutUser = CatchAsyncError(
         try {
             res.cookie("access_token", "", { maxAge: 1 });
             res.cookie("refresh_token", "", { maxAge: 1 });
+            
             const userId = req.user?._id || "";
             if (typeof userId === "string" && userId.length > 0) {
                 await redis.del(userId);
             }
+            
             res.status(200).json({
                 success: true,
                 message: "Logged out successfully",
@@ -235,6 +240,13 @@ export const updateAccessToken = CatchAsyncError(
 
             const user = JSON.parse(session);
 
+            // Verify user is an admin
+            if (user.role !== "admin") {
+                return next(
+                    new ErrorHandler("Access denied: Admin privileges required", 403)
+                );
+            }
+
             const accessToken = jwt.sign(
                 { id: user._id },
                 process.env.ACCESS_TOKEN as string,
@@ -264,19 +276,24 @@ export const updateAccessToken = CatchAsyncError(
                 accessToken,
                 refreshToken: newRefreshToken,
             });
-
         } catch (error: any) {
             return next(new ErrorHandler(error.message, 500));
         }
     }
 );
 
-//get user info
-export const getUserInfo = CatchAsyncError(
+// get admin info
+export const getAdminInfo = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?._id;
             if (typeof userId === 'string') {
+                const user = await userAdminModel.findById(userId);
+                
+                if (!user || user.role !== "admin") {
+                    return next(new ErrorHandler("Admin not found", 404));
+                }
+                
                 getUserById(userId, res);
             } else {
                 return next(new ErrorHandler("Invalid user ID", 400));

@@ -48,15 +48,33 @@ export const isAuthenticated = CatchAsyncError(
 
 // validate user role
 export const authorizeRoles = (...roles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-      if (!roles.includes(req.user?.role || "")) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user) {
+        return next(new ErrorHandler("User not authenticated", 401));
+      }
+
+      const userRole = req.user.role.toLowerCase();
+      const allowedRoles = roles.map(role => role.toLowerCase());
+
+      console.log("Role Check:", {
+        userRole,
+        allowedRoles,
+        hasAccess: allowedRoles.includes(userRole)
+      });
+
+      if (!allowedRoles.includes(userRole)) {
         return next(
           new ErrorHandler(
-            `Role: ${req.user?.role} is not allowed to access this resource`,
+            `Role: ${req.user.role} is not allowed to access this resource`,
             403
           )
         );
       }
+
       next();
-    };
+    } catch (error: any) {
+      return next(new ErrorHandler("Role authorization failed", 403));
+    }
   };
+};
