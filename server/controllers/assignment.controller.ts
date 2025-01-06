@@ -19,6 +19,7 @@ import { IAssignment } from '../models/mcq.model';
 export const createAssignmentController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const assignment = await createAssignment(req.body);
+    console.log(assignment);
     res.status(201).json({
       success: true,
       assignment,

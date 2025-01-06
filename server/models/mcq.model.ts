@@ -26,20 +26,6 @@ const mcqQuestionSchema: Schema = new mongoose.Schema({
     },
     required: [true, "Options are required"],
   },
-  guidelines: {
-    type: [String],
-    default: ["Guideline 1", "Guideline 2", "Guideline 3", "Guideline 4"],
-    validate: {
-      validator: function (guidelines: any[]) {
-        return guidelines.length === 4;
-      },
-      message: "Each question must have exactly four guidelines",
-    },
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-  },
 });
 
 export interface IMCQOption extends Document {
@@ -50,8 +36,6 @@ export interface IMCQOption extends Document {
 export interface IMCQQuestion extends Document {
   questionText: string;
   options: IMCQOption[];
-  guidelines: string[];
-  password: string;
 }
 
 export interface IAssignment extends Document {
@@ -62,6 +46,8 @@ export interface IAssignment extends Document {
   timeLimit: number; // Time limit in minutes
   createdAt: Date;
   updatedAt: Date;
+  guidelines: string[];
+  password: string;
 }
 
 const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
@@ -89,6 +75,20 @@ const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
       required: [true, "Time limit is required"],
       min: 1,
       max: 180, // Maximum 3 hours
+    },
+    guidelines: {
+      type: [String],
+      default: ["Guideline 1", "Guideline 2", "Guideline 3", "Guideline 4"],
+      validate: {
+        validator: function (guidelines: any[]) {
+          return guidelines.length === 4;
+        },
+        message: "Each question must have exactly four guidelines",
+      },
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
     },
   },
   { timestamps: true }
