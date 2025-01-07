@@ -15,7 +15,7 @@ import {
 } from '../controllers/assignment.controller';
 import {
   activateUser,
-  getUserInfo,
+  getAdminInfo,
   loginUser,
   logoutUser,
   registrationUser,
@@ -29,15 +29,15 @@ const userAdminRouter = express.Router();
 userAdminRouter.post('/AdminRegistration', registrationUser);
 userAdminRouter.post('/activate-AdminUser', activateUser);
 userAdminRouter.post('/login-AdminUser', loginUser);
-userAdminRouter.get('/logout-AdminUser', isAuthenticated, logoutUser);
+userAdminRouter.get('/logout-AdminUser', isAuthenticated, authorizeRoles('admin'), logoutUser);
 userAdminRouter.get('/refreshAdminToken', updateAccessToken);
-userAdminRouter.get('/meAdmin', isAuthenticated, getUserInfo);
+userAdminRouter.get('/meAdmin', isAuthenticated, authorizeRoles('admin'), getAdminInfo);
 
 // Assignment management routes
 userAdminRouter.post(
   '/create-assignment',
   isAuthenticated,
-  authorizeRoles('admin'), // Restrict to admin role
+  authorizeRoles('admin'),
   createAssignmentController
 );
 userAdminRouter.get(
@@ -75,6 +75,7 @@ userAdminRouter.post(
 userAdminRouter.post(
   '/quiz/:id/submit',
   isAuthenticated,
+  authorizeRoles('admin'),
   submitQuizController
 );
 userAdminRouter.get(
@@ -102,5 +103,18 @@ userAdminRouter.post(
   calculateScoreController
 );
 
+// Result generation routes
+userAdminRouter.get(
+  '/download-excel',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  downloadExcelSheet
+);
+userAdminRouter.get(
+  '/download-full-excel',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  downloadFullExcelSheet
+);
 
 export default userAdminRouter;

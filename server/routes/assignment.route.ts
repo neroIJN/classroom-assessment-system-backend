@@ -12,12 +12,12 @@ import {
   getQuizSubmissionsByAssignmentController,
 } from '../controllers/assignment.controller';
 import { checkAssignmentExists } from '../middleware/assignment.middleware';
-import { isAuthenticated } from '../middleware/auth';
+import { isAuthenticated,authorizeRoles } from '../middleware/auth';
 
 const router = express.Router();
 
 // Create a new assignment
-router.post('/create', isAuthenticated, createAssignmentController);
+
 
 // Get an assignment by ID
 router.get('/:id', checkAssignmentExists, getAssignmentByIdController);
