@@ -29,7 +29,7 @@ app.get("/test", (req: Request, res: Response, next: NextFunction) => {
         message: "API is working"
     });
 });
-s
+
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
     const err = new Error(`Route ${req.originalUrl} not found`) as any;
