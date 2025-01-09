@@ -15,7 +15,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001','http://18.138.252.156:3001' ,'http://18.138.252.156:3000' ], // Allow requests from localhost:3000
+    origin: ['http://localhost:3000', 'http://localhost:3001','http://54.255.243.254:3001' ,'http://54.255.243.254:3000' ], // Allow requests from localhost:3000
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // If you're using cookies or authentication
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -29,6 +29,7 @@ app.get("/test", (req: Request, res: Response, next: NextFunction) => {
         message: "API is working"
     });
 });
+s
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
     const err = new Error(`Route ${req.originalUrl} not found`) as any;
