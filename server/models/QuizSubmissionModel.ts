@@ -1,12 +1,18 @@
+// 
+
+// models/quizSubmission.model.ts
 import mongoose, { Document, Schema } from "mongoose";
 import userModel from "./user.model";
+
 export interface IQuizSubmission extends Document {
   assignmentId: mongoose.Schema.Types.ObjectId;
   userId: mongoose.Schema.Types.ObjectId;
   registrationNumber: string;
   answers: {
     questionId: mongoose.Schema.Types.ObjectId;
+    questionText: string;
     selectedOption: mongoose.Schema.Types.ObjectId;
+    selectedOptionText: string;
   }[];
   score: number;
   timeTaken: number;
@@ -24,17 +30,25 @@ const quizSubmissionSchema: Schema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  registrationNumber:{
+  registrationNumber: {
     type: String,
-    required:true
+    required: true
   },
   answers: [{
     questionId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true
     },
+    questionText: {
+      type: String,
+      required: true
+    },
     selectedOption: {
       type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
+    selectedOptionText: {
+      type: String,
       required: true
     }
   }],
@@ -51,7 +65,6 @@ const quizSubmissionSchema: Schema = new mongoose.Schema({
     default: Date.now
   }
 });
-
 
 const QuizSubmissionModel = mongoose.model<IQuizSubmission>('QuizSubmission', quizSubmissionSchema);
 

@@ -13,7 +13,7 @@ import {
 } from '../controllers/assignment.controller';
 import { checkAssignmentExists } from '../middleware/assignment.middleware';
 import { isAuthenticated,authorizeRoles } from '../middleware/auth';
-
+import { validateQuizSubmission } from '../middleware/assignment.middleware';
 const router = express.Router();
 
 // Create a new assignment
@@ -35,7 +35,7 @@ router.get('/teacher/:teacherId', getAllAssignmentsController);
 router.post('/:id/start', startQuizController);
 
 // Submit a quiz
-router.post('/:id/submit', submitQuizController);
+router.post('/:id/submit',validateQuizSubmission, submitQuizController);
 
 // Get a specific quiz submission
 router.get('/submission/:submissionId', getQuizSubmissionController);
