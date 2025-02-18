@@ -33,3 +33,53 @@ export const errorMiddleware = (err: ErrorHandler | Error, req: Request, res: Re
     message,
   });
 };
+export const validateQuizSubmission = (req: Request, res: Response, next: NextFunction) => {
+  const { userId, answers, startTime } = req.body;
+  const assignmentId = req.params.id;
+
+  if (!userId || !assignmentId || !answers || !startTime) {
+    return res.status(400).json({
+      success: false,
+      message: 'Missing required fields: userId, assignmentId, answers, or startTime'
+    });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(assignmentId)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid userId or assignmentId format'
+    });
+  }
+
+  if (!Array.isArray(answers) || answers.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'Answers must be a non-empty array'
+    });
+  }
+
+  const isValidAnswers = answers.every(answer => 
+    answer.questionId && 
+    answer.selectedOption && 
+    mongoose.Types.ObjectId.isValid(answer.questionId) && 
+    mongoose.Types.ObjectId.isValid(answer.selectedOption)
+  );
+
+  if (!isValidAnswers) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid answer format. Each answer must have valid questionId and selectedOption'
+    });
+  }
+
+  try {
+    new Date(startTime);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid startTime format'
+    });
+  }
+
+  next();
+};

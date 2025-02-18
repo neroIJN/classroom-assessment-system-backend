@@ -92,6 +92,42 @@ export const startQuizController = async (req: Request, res: Response, next: Nex
 };
 
 // Submit a quiz
+// export const submitQuizController = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const { userId, answers, startTime } = req.body;
+
+//     if (!Array.isArray(answers)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Answers must be provided as an array',
+//       });
+//     }
+
+//     const submission = {
+//       assignmentId: req.params.id,
+//       userId,
+//       answers,
+//       startTime: new Date(startTime),
+//     };
+
+//     const result = await submitQuiz(submission);
+//     res.status(200).json({
+//       success: true,
+//       submission: result,
+//     });
+//   } catch (error: any) {
+//     console.error('Error in quiz submission:', error);
+//     if (error.message === 'Time limit exceeded') {
+//       res.status(400).json({
+//         success: false,
+//         message: error.message,
+//       });
+//     } else {
+//       next(error);
+//     }
+//   }
+// };
+
 export const submitQuizController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId, answers, startTime } = req.body;
@@ -117,7 +153,9 @@ export const submitQuizController = async (req: Request, res: Response, next: Ne
     });
   } catch (error: any) {
     console.error('Error in quiz submission:', error);
-    if (error.message === 'Time limit exceeded') {
+    if (error.message === 'Time limit exceeded' || 
+        error.message.includes('Question') || 
+        error.message.includes('Option')) {
       res.status(400).json({
         success: false,
         message: error.message,
