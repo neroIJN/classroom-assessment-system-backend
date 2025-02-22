@@ -22,7 +22,7 @@ import {
   updateAccessToken,
 } from '../controllers/userAdmin.controller';
 import { isAuthenticated, authorizeRoles } from '../middleware/auth';
-
+import { forgotPassword, verifyResetToken, resetPassword } from '../controllers/auth.controller';
 const userAdminRouter = express.Router();
 
 // Admin-specific user management routes
@@ -116,5 +116,13 @@ userAdminRouter.get(
   authorizeRoles('admin'),
   downloadFullExcelSheet
 );
+
+// Password reset routes
+
+userAdminRouter.post('/forgot-password', forgotPassword);
+userAdminRouter.get('/verify-reset-token', verifyResetToken);
+userAdminRouter.post('/reset-password', resetPassword);
+
+// Refresh access token
 
 export default userAdminRouter;
