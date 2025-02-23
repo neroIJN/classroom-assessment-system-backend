@@ -91,6 +91,7 @@ export const startQuizController = async (req: Request, res: Response, next: Nex
   }
 };
 
+
 export const submitQuizController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId, answers, startTime } = req.body;

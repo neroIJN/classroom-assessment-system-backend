@@ -82,61 +82,7 @@ export const updateScore = (assignment: IAssignment, answers: { questionId: stri
 };
 
 
-// export const submitQuiz = async (submission: QuizSubmission): Promise<IQuizSubmission> => {
-//   const assignment = await AssignmentModel.findById(submission.assignmentId);
-//   if (!assignment) {
-//     throw new Error('Assignment not found');
-//   }
 
-// //  Fetch user details to get the registration number
-//   const user = await userModel.findById(submission.userId);
-//   if (!user) {
-//     throw new Error('User not found');
-//   }
-//   const registrationNumber = user.registrationNumber; // Retrieve the registration number from the user
-
-//   const endTime = new Date();
-//   const timeTaken = (endTime.getTime() - submission.startTime.getTime()) / 60000; // in minutes
-
-//   // console.log('Start Time:', submission.startTime);
-//   // console.log('End Time:', endTime);
-//   // console.log('Time Taken (minutes):', timeTaken);
-//   // console.log('Allowed Time (minutes):', assignment.timeLimit);
-
-//   // if (timeTaken > assignment.timeLimit) {
-//   //   throw new Error('Time limit exceeded');
-//   // }
-
-//   // Calculate score
-//   let score = 0;
-//   submission.answers.forEach(answer => {
-//     const question = assignment.questions.find(q => q._id && q._id.toString() === answer.questionId);
-//     if (question) {
-//       const correctOption = question.options.find(option => option.isCorrect);
-//       if (correctOption && correctOption._id && correctOption._id.toString() === answer.selectedOption) {
-//         score++;
-//       }
-//     }
-//   });
-
-//   // Create and save the quiz submission
-//   const quizSubmission = new QuizSubmissionModel({
-//     assignmentId: new mongoose.Types.ObjectId(submission.assignmentId),
-//     userId: new mongoose.Types.ObjectId(submission.userId),
-//     registrationNumber,
-//     answers: submission.answers.map(answer => ({
-//       questionId: new mongoose.Types.ObjectId(answer.questionId),
-//       selectedOption: new mongoose.Types.ObjectId(answer.selectedOption)
-//     })),
-//     score,
-//     timeTaken,
-//     submittedAt: endTime
-//   });
-
-//   await quizSubmission.save();
-
-//   return quizSubmission;
-// };
 
 export const submitQuiz = async (submission: QuizSubmission): Promise<IQuizSubmission> => {
   // Fetch the complete assignment and log its structure

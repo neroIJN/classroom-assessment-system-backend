@@ -48,6 +48,9 @@ export interface IAssignment extends Document {
   updatedAt: Date;
   guidelines: string[];
   password: string;
+  mainStartTime: Date; // Main start time for the quiz
+  mainEndTime: Date;   // Main end time for the quiz
+  startDate: Date;     // Start date for the quiz
 }
 
 const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
@@ -89,6 +92,18 @@ const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
+    },
+    mainStartTime: {
+      type: Date,
+      required: [true, "Main start time is required"],
+    },
+    mainEndTime: {
+      type: Date,
+      required: [true, "Main end time is required"],
+    },
+    startDate: {
+      type: Date,
+      required: [true, "Start date is required"],
     },
   },
   { timestamps: true }
