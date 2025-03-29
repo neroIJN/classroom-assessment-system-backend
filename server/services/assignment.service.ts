@@ -73,7 +73,7 @@ export const updateScore = (assignment: IAssignment, answers: { questionId: stri
     if (question) {
       const correctOption = question.options.find(option => option.isCorrect);
       if (correctOption && correctOption._id && correctOption._id.toString() === answer.selectedOption) {
-        score++;
+        score = score + question.pointsForQuestion; // Add points for the correct answer
       }
     }
   });
@@ -138,7 +138,7 @@ export const submitQuiz = async (submission: QuizSubmission): Promise<IQuizSubmi
     }
 
     if (selectedOption.isCorrect) {
-      score++;
+      score = score + question.pointsForQuestion; // Add points for the correct answer
     }
 
     return {

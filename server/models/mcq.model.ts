@@ -26,6 +26,10 @@ const mcqQuestionSchema: Schema = new mongoose.Schema({
     },
     required: [true, "Options are required"],
   },
+  pointsForQuestion: { // for give different points per question
+    type: Number,
+    default: 1,
+  },
 });
 
 export interface IMCQOption extends Document {
@@ -36,6 +40,7 @@ export interface IMCQOption extends Document {
 export interface IMCQQuestion extends Document {
   questionText: string;
   options: IMCQOption[];
+  pointsForQuestion: number; // for give different points per question
 }
 
 export interface IAssignment extends Document {
