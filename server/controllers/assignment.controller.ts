@@ -5,13 +5,15 @@ import {
   updateAssignment,
   deleteAssignment,
   getAllAssignments,
+  getActiveAssignments,
+  getUpcomingAssignments,
+  getPastAssignments,
   startQuiz,
   submitQuiz,
   getQuizSubmission,
   getQuizSubmissionsByUser,
   getQuizSubmissionsByAssignment,
   updateScore,
-  
 } from '../services/assignment.service';
 import { IAssignment } from '../models/mcq.model';
 
@@ -30,12 +32,23 @@ export const createAssignmentController = async (req: Request, res: Response, ne
 };
 
 // Get an assignment by ID
-export const getAssignmentByIdController = async (req: Request, res: Response) => {
-  const assignment = await getAssignmentById(req.params.id);
-  res.status(200).json({
-    success: true,
-    assignment,
-  });
+export const getAssignmentByIdController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const assignment = await getAssignmentById(req.params.id);
+    if (!assignment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Assignment not found',
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      assignment,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Update an assignment by ID
@@ -77,21 +90,61 @@ export const getAllAssignmentsController = async (req: Request, res: Response, n
   }
 };
 
-// Start a quiz
-export const startQuizController = async (req: Request, res: Response, next: NextFunction) => {
+// Get active assignments for a teacher
+export const getActiveAssignmentsController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { assignment, startTime } = await startQuiz(req.params.id, req.body.userId);
+    const assignments = await getActiveAssignments(req.params.teacherId);
     res.status(200).json({
       success: true,
-      assignment,
-      startTime,
+      assignments,
     });
   } catch (error) {
     next(error);
   }
 };
 
+// Get upcoming assignments for a teacher
+export const getUpcomingAssignmentsController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const assignments = await getUpcomingAssignments(req.params.teacherId);
+    res.status(200).json({
+      success: true,
+      assignments,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
+// Get past assignments for a teacher
+export const getPastAssignmentsController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const assignments = await getPastAssignments(req.params.teacherId);
+    res.status(200).json({
+      success: true,
+      assignments,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Start a quiz
+export const startQuizController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { assignment, startTime, score } = await startQuiz(req.params.id, req.body.userId);
+    res.status(200).json({
+      success: true,
+      assignment,
+      startTime,
+      score,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Submit a quiz
 export const submitQuizController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId, answers, startTime } = req.body;
@@ -118,6 +171,7 @@ export const submitQuizController = async (req: Request, res: Response, next: Ne
   } catch (error: any) {
     console.error('Error in quiz submission:', error);
     if (error.message === 'Time limit exceeded' || 
+        error.message === 'This assignment has expired, submissions are no longer accepted' ||
         error.message.includes('Question') || 
         error.message.includes('Option')) {
       res.status(400).json({
@@ -175,23 +229,25 @@ export const getQuizSubmissionsByAssignmentController = async (req: Request, res
   }
 };
 
-//calculate the score real time for quiz,
-//Here teacher can use this method if need , after the assignment the result wiil be visible to the users
-
-export const calculateScoreController = async (req: Request, res: Response, next: NextFunction) =>{
+// Calculate the score real time for quiz
+export const calculateScoreController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const assignment = await getAssignmentById(req.params.id)
-    const {answers} = req.body;
+    const assignment = await getAssignmentById(req.params.id);
+    const { answers } = req.body;
 
-    if(assignment){
-      const score = updateScore(assignment, answers);
-      res.status(200).json({
-        success:true,
-        score
-      })
+    if (!assignment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Assignment not found',
+      });
     }
+
+    const score = updateScore(assignment, answers);
+    res.status(200).json({
+      success: true,
+      score
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
-

@@ -53,9 +53,8 @@ export interface IAssignment extends Document {
   updatedAt: Date;
   guidelines: string[];
   password: string;
-  mainStartTime: Date; // Main start time for the quiz
-  mainEndTime: Date;   // Main end time for the quiz
-  startDate: Date;     // Start date for the quiz
+  startDate: Date; // Start date for the assignment
+  endDate: Date;   // End date for the assignment
 }
 
 const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
@@ -98,17 +97,13 @@ const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
     },
-    mainStartTime: {
-      type: Date,
-      required: [true, "Main start time is required"],
-    },
-    mainEndTime: {
-      type: Date,
-      required: [true, "Main end time is required"],
-    },
     startDate: {
       type: Date,
       required: [true, "Start date is required"],
+    },
+    endDate: {
+      type: Date,
+      required: [true, "End date is required"],
     },
   },
   { timestamps: true }
@@ -117,6 +112,7 @@ const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
 const AssignmentModel: Model<IAssignment> = mongoose.model("Assignment", assignmentSchema);
 
 export default AssignmentModel;
+
 // Example of a Postman request body for creating an assignment
 // const exampleRequestBody = {
 //   title: "Basic Quiz",
@@ -130,10 +126,12 @@ export default AssignmentModel;
 //         { text: "4", isCorrect: true },
 //         { text: "5", isCorrect: false },
 //         { text: "6", isCorrect: false }
-//       ],
-//       guidelines: ["Guideline 1", "Guideline 2", "Guideline 3", "Guideline 4"],
-//       password: "Test"
+//       ]
 //     }
 //   ],
-//   teacherId: "66f7bd8a6a41a029fdb5b47b"
+//   guidelines: ["Guideline 1", "Guideline 2", "Guideline 3", "Guideline 4"],
+//   password: "Test",
+//   teacherId: "66f7bd8a6a41a029fdb5b47b",
+//   startDate: "2025-04-01T08:00:00.000Z",
+//   endDate: "2025-04-10T18:00:00.000Z"
 // };

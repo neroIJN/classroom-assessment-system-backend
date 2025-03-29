@@ -8,9 +8,14 @@ import {
     addEssayItem,
     startEssayAssignment,
     submitEssay,
+    getEssaySubmission,
+    getEssaySubmissionsByUser,
     getEssaySubmissionsByAssignment,
-  } from "../services/essay.service";
-  import EssayAssignmentModel from "../models/essay.model";
+    getActiveEssays,
+    getUpcomingEssays,
+    getPastEssays
+} from "../services/essay.service";
+import EssayAssignmentModel from "../models/essay.model";
 
 // Create a new essay assignment
 export const createEssayAssignmentController = async (req: Request, res: Response, next: NextFunction) => {
@@ -83,6 +88,45 @@ export const getAllEssayAssignmentsController = async (req:Request, res:Response
     }
 };
 
+// Get active essay assignments
+export const getActiveEssayAssignmentsController = async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        const essayAssignments = await getActiveEssays(req.params.teacherId);
+        res.status(200).json({
+            success: true,
+            essayAssignments,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Get upcoming essay assignments
+export const getUpcomingEssayAssignmentsController = async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        const essayAssignments = await getUpcomingEssays(req.params.teacherId);
+        res.status(200).json({
+            success: true,
+            essayAssignments,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Get past essay assignments
+export const getPastEssayAssignmentsController = async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        const essayAssignments = await getPastEssays(req.params.teacherId);
+        res.status(200).json({
+            success: true,
+            essayAssignments,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // Add an item to an essay assignment
 export const addEssayItemController = async (req:Request, res:Response, next:NextFunction) => {
     try {
@@ -96,22 +140,22 @@ export const addEssayItemController = async (req:Request, res:Response, next:Nex
     }
 };
 
-// Start an  essay assignment
+// Start an essay assignment
 export const startEssayAssignmentController = async (req:Request, res:Response, next:NextFunction) => {
   try {
-    const {assignment, startTime} = await startEssayAssignment(req.params.id, req.body.userId);
+    const {assignment, startTime, score} = await startEssayAssignment(req.params.id, req.body.userId);
     res.status(200).json({
       success: true,
       assignment,
       startTime,
-    })
-    
+      score
+    });
   } catch (error) {
     next(error);    
   }
 };
 
-// submit a essay assignment
+// Submit an essay assignment
 export const submitEssayAssignmentController = async (req:Request, res:Response, next:NextFunction) => {
   try {
     const {userId, answers, startTime} = req.body;
@@ -137,12 +181,14 @@ export const submitEssayAssignmentController = async (req:Request, res:Response,
     });
   } catch (error: any) {
     console.error("Error in essay submission:", error);
-    if (error.message === "Time limit exceeded") {
+    if (error.message === "Time limit exceeded" || 
+        error.message === "This assignment has expired, submissions are no longer accepted" ||
+        error.message === "This assignment is not yet available") {
       res.status(400).json({
         success: false,
         message: error.message,
       });
-    }else{
+    } else {
       next(error);
     }   
   }
@@ -151,7 +197,7 @@ export const submitEssayAssignmentController = async (req:Request, res:Response,
 // Get specific essay submission
 export const getEssaySubmissionController = async (req:Request, res:Response, next:NextFunction) => {
   try {
-    const submission = await EssayAssignmentModel.findById(req.params.submissionId);
+    const submission = await getEssaySubmission(req.params.submissionId);
     if (!submission) {
       return res.status(404).json({
         success: false,
@@ -170,7 +216,7 @@ export const getEssaySubmissionController = async (req:Request, res:Response, ne
 // Get all essay submissions for a user
 export const getEssaySubmissionsByUserController = async (req:Request, res:Response, next:NextFunction) => {
   try {
-    const submissions = await EssayAssignmentModel.find({userId: req.params.userId});
+    const submissions = await getEssaySubmissionsByUser(req.params.userId);
     res.status(200).json({
       success: true,
       submissions,

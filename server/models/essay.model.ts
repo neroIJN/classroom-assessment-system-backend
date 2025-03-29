@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-// Define the schema for a essays
+// Define the schema for essays
 const essaysSchema: Schema = new Schema({
     questionText: {
         type: String,
@@ -25,6 +25,8 @@ export interface IEssayAssignment extends Document {
     password: string;
     teacherId: mongoose.Schema.Types.ObjectId;
     timeLimit: number; // Time limit in minutes
+    startDate: Date;   // Start date for the assignment
+    endDate: Date;     // End date for the assignment
     createdAt: Date;
     updatedAt: Date;
 }
@@ -69,10 +71,18 @@ const essayAssignmentSchema: Schema<IEssayAssignment> = new mongoose.Schema(
             min: 1,
             max: 180, // Maximum 3 hours
         },
+        startDate: {
+            type: Date,
+            required: [true, "Start date is required"],
+        },
+        endDate: {
+            type: Date,
+            required: [true, "End date is required"],
+        },
     },
     { timestamps: true }
 );
 
-const EssayAssignmentModel:Model<IEssayAssignment> = mongoose.model("EssayAssignment", essayAssignmentSchema);
+const EssayAssignmentModel: Model<IEssayAssignment> = mongoose.model("EssayAssignment", essayAssignmentSchema);
 
 export default EssayAssignmentModel;
