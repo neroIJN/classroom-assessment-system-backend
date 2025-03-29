@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   activateUser,
+  getUserByIdController,
   getUserInfo,
   loginUser,
   logoutUser,
@@ -34,7 +35,8 @@ userRouter.get('/me', isAuthenticated, getUserInfo);
 //vilate the user movement
 userRouter.post('/violations', violationMiddleware.validateViolationPayload,
   violationController.logViolation);
-
+//get user by id
+userRouter.get('/user/:id', getUserByIdController);
 
 userRouter.get(
   '/violations/:quizId/student/:studentId',

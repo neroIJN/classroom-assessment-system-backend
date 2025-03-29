@@ -34,3 +34,8 @@ export const updateUserRoleService = async (res:Response,id: string,role:string)
     user,
   });
 }
+
+// get user by id
+export const getUserByIdService = async (res: Response, id: string) => {
+  return await userModel.findById(id);
+};

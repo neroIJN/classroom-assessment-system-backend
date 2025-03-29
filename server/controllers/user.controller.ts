@@ -13,7 +13,7 @@ import {
   sendToken,
 } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getUserById } from "../services/user.service";
+import { getUserById, getUserByIdService } from "../services/user.service";
 
 // register user
 interface IRegistrationBody {
@@ -302,6 +302,23 @@ export const getUserInfo = CatchAsyncError(
   }
 );
 
-
+// get user by id
+export const getUserByIdController = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.params.id;
+      const user = await getUserByIdService(res, userId);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+)
 
 
