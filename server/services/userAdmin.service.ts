@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { redis } from "../utils/redis";
 import userModel from "../models/userAdmin.model";
+import userAdminModel from "../models/userAdmin.model";
 
 // get user by id
 export const getUserById = async (id: string, res: Response) => {
@@ -33,4 +34,9 @@ export const updateUserRoleService = async (res:Response,id: string,role:string)
     success: true,
     user,
   });
+}
+
+// update user
+export const updateUserService = async (id: string,body:any) => {
+  return await userAdminModel.findByIdAndUpdate(id,body, { new: true });
 }

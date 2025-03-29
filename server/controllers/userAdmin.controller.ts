@@ -13,7 +13,7 @@ import {
     sendToken,
 } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getUserById } from "../services/userAdmin.service";
+import { getUserById, updateUserService } from "../services/userAdmin.service";
 
 // register user
 interface IRegistrationBody {
@@ -303,3 +303,68 @@ export const getAdminInfo = CatchAsyncError(
         }
     }
 );
+
+// update user password
+export const updateUserPasswordController = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { oldPassword, newPassword } = req.body;
+            const userId = req.user?._id;
+
+            if (typeof userId === 'string') {
+                const user = await userAdminModel.findById(userId).select("+password");
+                
+                if (!user) {
+                    return next(new ErrorHandler("User not found", 404));
+                }
+                
+                const isPasswordMatch = await user.comparePassword(oldPassword);
+                if (!isPasswordMatch) {
+                    return next(new ErrorHandler("Old password is incorrect", 400));
+                }
+                
+                user.password = newPassword;
+                await user.save();
+                
+                res.status(200).json({
+                    success: true,
+                    message: "Password updated successfully",
+                });
+            } else {
+                return next(new ErrorHandler("Invalid user ID", 400));
+            }
+        } catch (error: any) {
+            return next(new ErrorHandler(error.message, 400));
+        }
+    }
+);
+
+// update user profile
+export const updateUserAdminProfileController = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { name, email } = req.body;
+        const userId = req.user?._id;
+        if (typeof userId ==='string') {
+            const user = await userAdminModel.findById(userId);
+            if (!user) {
+                return next(new ErrorHandler("User not found", 404));
+            }
+            
+            user.name = name || user.name;
+            user.email = email || user.email;
+            
+            const updateResult = await updateUserService(userId, req.body);
+            
+            res.status(200).json({
+                success: true,
+                message: "Profile updated successfully",
+                updateResult,
+            });
+        }
+        else {
+            return next(new ErrorHandler("Invalid user ID", 400));
+        }
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+    }
+}

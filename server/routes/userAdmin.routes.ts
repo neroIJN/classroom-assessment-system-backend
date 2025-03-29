@@ -20,6 +20,8 @@ import {
   logoutUser,
   registrationUser,
   updateAccessToken,
+  updateUserAdminProfileController,
+  updateUserPasswordController,
 } from '../controllers/userAdmin.controller';
 import { isAuthenticated, authorizeRoles } from '../middleware/auth';
 import { forgotPassword, verifyResetToken, resetPassword } from '../controllers/auth.controller';
@@ -116,6 +118,23 @@ userAdminRouter.get(
   authorizeRoles('admin'),
   downloadFullExcelSheet
 );
+
+// User management routes
+// update profile
+userAdminRouter.put(
+  '/update-profile',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  updateUserAdminProfileController
+);
+
+//update password
+userAdminRouter.put(
+  '/update-password',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  updateUserPasswordController
+)
 
 // Password reset routes
 
