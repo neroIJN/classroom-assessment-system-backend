@@ -10,5 +10,6 @@ export const getFeedbackById = async (id: string): Promise<IFeedback | null> => 
 }
 
 export const getFeedbackByAssignmentId = async (assignmentId: string): Promise<IFeedback[] | null> => {
-    return await FeedbackModel.find({ assignmentId });
+    const filter = assignmentId ? {assignmentId} : {};
+    return await FeedbackModel.find(filter).exec();
 }
