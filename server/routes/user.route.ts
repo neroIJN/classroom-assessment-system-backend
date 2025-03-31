@@ -10,6 +10,7 @@ import {
 } from '../controllers/user.controller';
 import { isAuthenticated } from '../middleware/auth';
 import { ViolationController } from '../controllers/violation.controller';
+import { startQuizSessionController, heartbeatController, completeQuizSessionController, getQuizStatsController } from '../controllers/QuizTracking.controller';
 import { ViolationMiddleware } from '../middleware/violation.middleware';
 const violationController = new ViolationController();
 const violationMiddleware = new ViolationMiddleware();
@@ -47,4 +48,18 @@ userRouter.get(
   '/violations/:quizId/summary',
   violationController.getQuizViolationsSummary
 );
+
+userRouter.post('/quiz-session/start',
+  startQuizSessionController);
+
+userRouter.post('/quiz-session/heartbeat', 
+  heartbeatController);
+
+userRouter.post('/quiz-session/complete', 
+  completeQuizSessionController);
+// Get quiz activity stats for a specific quiz
+userRouter.get('/stats/:quizId', getQuizStatsController);
+
 export default userRouter;
+
+
