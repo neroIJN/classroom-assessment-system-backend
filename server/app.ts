@@ -23,6 +23,7 @@ app.use(cors({
 }));
 
 app.use("/api/v1", userAdminRouter,userRouter,router,structurerouter,essayRouter,resultRouter, feedbackRouter);
+
 //Testing API
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({

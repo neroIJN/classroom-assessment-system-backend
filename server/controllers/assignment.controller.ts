@@ -42,6 +42,22 @@ export const getAssignmentByIdController = async (req: Request, res: Response, n
       });
     }
     
+    // For students accessing the waiting page, don't include questions to prevent cheating
+    // Only return the basic information needed for the waiting page
+    if (req.query.forWaiting === 'true') {
+      return res.status(200).json({
+        _id: assignment._id,
+        title: assignment.title,
+        description: assignment.description,
+        timeLimit: assignment.timeLimit,
+        startDate: assignment.startDate,
+        endDate: assignment.endDate,
+        teacherId: assignment.teacherId,
+        success: true
+      });
+    }
+    
+    // Otherwise return the full assignment (for teachers or when taking the quiz)
     res.status(200).json({
       success: true,
       assignment,
