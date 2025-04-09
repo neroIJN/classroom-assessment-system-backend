@@ -91,5 +91,22 @@ export class ViolationService {
       throw error;
     }
   }
+
+
+  async getLiveViolations(quizId: string, timeWindow: number = 30): Promise<IViolation[]> {
+    try {
+      // Get violations from the last 'timeWindow' minutes (default 30 minutes)
+      const cutoffTime = new Date(Date.now() - timeWindow * 60 * 1000);
+      
+      return await ViolationModel.find({
+        quizId,
+        'violation.timestamp': { $gte: cutoffTime }
+      })
+      .populate('studentId', 'name email registrationNumber')
+      .sort({ 'violation.timestamp': -1 });
+    } catch (error) {
+      throw new Error(`Failed to fetch live violations: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }
 
