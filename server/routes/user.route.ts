@@ -59,7 +59,11 @@ userRouter.post('/quiz-session/complete',
   completeQuizSessionController);
 // Get quiz activity stats for a specific quiz
 userRouter.get('/stats/:quizId', getQuizStatsController);
-
+// Route for getting live violations in a quiz
+userRouter.get(
+  '/violations/:quizId/live',
+  violationController.getLiveViolations
+);
 export default userRouter;
 
 
