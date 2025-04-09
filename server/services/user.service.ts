@@ -39,3 +39,15 @@ export const updateUserRoleService = async (res:Response,id: string,role:string)
 export const getUserByIdService = async (res: Response, id: string) => {
   return await userModel.findById(id);
 };
+
+// update whether user repeat or not with repeat batch
+export const updateUserRepeatBatchService = async (res: Response, id: string, repeatingBatch: number, isRepeater: boolean) => {
+  const user = await userModel.findByIdAndUpdate(id, { repeatingBatch, isRepeater }, { new: true });
+
+  res.status(201).json({
+    success: true,
+    user,
+  });
+
+  return user;
+}
