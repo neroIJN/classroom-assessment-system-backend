@@ -7,6 +7,7 @@ import {
   logoutUser,
   registrationUser,
   updateAccessToken,
+  updateUserRepeatBatch,
 } from '../controllers/user.controller';
 import { isAuthenticated } from '../middleware/auth';
 import { ViolationController } from '../controllers/violation.controller';
@@ -64,6 +65,11 @@ userRouter.get(
   '/violations/:quizId/live',
   violationController.getLiveViolations
 );
+
+// update whether a student is a repeater or not with repeat batch
+userRouter.put(
+  '/update-repeater/:id', isAuthenticated, updateUserRepeatBatch);
+
 export default userRouter;
 
 

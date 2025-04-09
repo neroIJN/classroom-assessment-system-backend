@@ -1,7 +1,7 @@
 require("dotenv").config();
 import { Request, Response, NextFunction } from "express";
 import userModel, { IUser } from "../models/user.model";
-import {ErrorHandler} from "../utils/ErrorHandler";
+import { ErrorHandler } from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncError";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import ejs, { Template } from "ejs";
@@ -13,7 +13,7 @@ import {
   sendToken,
 } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getUserById, getUserByIdService } from "../services/user.service";
+import { getUserById, getUserByIdService, updateUserRepeatBatchService } from "../services/user.service";
 
 // register user
 interface IRegistrationBody {
@@ -22,12 +22,13 @@ interface IRegistrationBody {
   password: string;
   avatar?: string;
   registrationNumber: string;
+  batch: number;
 }
 
 export const registrationUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email, password, registrationNumber } = req.body;
+      const { name, email, password, registrationNumber, batch } = req.body;
 
       const isEmailExist = await userModel.findOne({ email });
       if (isEmailExist) {
@@ -48,6 +49,7 @@ export const registrationUser = CatchAsyncError(
         email,
         password,
         registrationNumber,
+        batch,
       };
 
       const activationToken = createActivationToken(user);
@@ -124,7 +126,7 @@ export const activateUser = CatchAsyncError(
         return next(new ErrorHandler("Invalid activation code", 400));
       }
 
-      const { name, email, password, registrationNumber } = newUser.user;
+      const { name, email, password, registrationNumber, batch } = newUser.user;
 
       const existUser = await userModel.findOne({ email });
 
@@ -146,6 +148,7 @@ export const activateUser = CatchAsyncError(
         email,
         password,
         registrationNumber,
+        batch,
       });
 
       res.status(201).json({
@@ -223,7 +226,7 @@ export const updateAccessToken = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const refresh_token = req.cookies.refresh_token as string;
-      
+
       if (!refresh_token) {
         return next(new ErrorHandler("No refresh token provided", 400));
       }
@@ -321,4 +324,22 @@ export const getUserByIdController = CatchAsyncError(
   }
 )
 
-
+// update whether an student is a repeater or not with repeat batch
+export const updateUserRepeatBatch = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.params.id;
+      const { repeatingBatch, isRepeater } = req.body;
+      const user = await updateUserRepeatBatchService(res, userId, repeatingBatch, isRepeater);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+)

@@ -23,6 +23,7 @@ export interface IEssayAssignment extends Document {
     questions: IEssay[];
     guidelines: string[];
     password: string;
+    intendedBatch: number;
     teacherId: mongoose.Schema.Types.ObjectId;
     timeLimit: number; // Time limit in minutes
     startDate: Date;   // Start date for the assignment
@@ -59,6 +60,10 @@ const essayAssignmentSchema: Schema<IEssayAssignment> = new mongoose.Schema(
         password: {
             type: String,
             required: [true, "Password is required"],
+        },
+        intendedBatch: {
+            type: Number,
+            required: [true, "Intended batch is required"],
         },
         teacherId: {
             type: mongoose.Schema.Types.ObjectId,

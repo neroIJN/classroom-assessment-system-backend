@@ -18,6 +18,9 @@ export interface IUser extends Document {
   isVerified: boolean;
   courses: Array<{ courseId: string }>;
   registrationNumber: string;
+  batch: number;
+  isRepeater: boolean;
+  repeatingBatch: number;
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
@@ -72,6 +75,18 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
         message: "Please enter a valid registration number (e.g., EG/2024/0001)",
       },
       unique: true,
+    },
+    batch: {
+      type: Number,
+      required: [true, "Please enter your batch"],
+    },
+    isRepeater: {
+      type: Boolean,
+      default: false,
+    },
+    repeatingBatch: {
+      type: Number,
+      default: null,
     },
   },
   { timestamps: true }
