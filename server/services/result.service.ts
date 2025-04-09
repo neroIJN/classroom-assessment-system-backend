@@ -80,3 +80,27 @@ export const getAssignmentViolationStats = async (assignmentId: string) => {
     throw new Error(`Failed to fetch violation statistics: ${error.message}`);
   }
 };
+/**
+ * Get essay violations for a specific student
+ * @param assignmentId - Essay assignment ID
+ * @param studentId - Student ID
+ * @returns Array of violations for the student
+ */
+export const getStudentEssayViolations = async (assignmentId: string, studentId: string) => {
+  try {
+    // Convert string IDs to ObjectIds
+    const quizId = new Types.ObjectId(assignmentId);
+    const studentObjectId = new Types.ObjectId(studentId);
+    
+    // Find violations for this student on this assignment
+    const violations = await ViolationModel.find({
+      quizId: quizId,
+      studentId: studentObjectId
+    }).sort({ "violation.timestamp": -1 }); // Most recent first
+    
+    return violations;
+  } catch (error) {
+    console.error('Error fetching student essay violations:', error);
+    throw new Error(`Failed to fetch student violations: ${error.message}`);
+  }
+};

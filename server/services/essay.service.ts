@@ -189,11 +189,15 @@ export const submitEssay = async (submission: EssaySubmission): Promise<IEssaySu
         throw new ErrorHandler('This assignment has expired, submissions are no longer accepted', 403);
     }
 
-    const user = await userModel.findById(submission.userId);
-    if (!user) {
-        throw new ErrorHandler('User not found', 404);
+    // Get registration number from user if not provided
+    let registrationNumber = submission.registrationNumber;
+    if (!registrationNumber) {
+        const user = await userModel.findById(submission.userId);
+        if (!user) {
+            throw new ErrorHandler('User not found', 404);
+        }
+        registrationNumber = user.registrationNumber;
     }
-    const registrationNumber = user.registrationNumber;
 
     const endTime = new Date();
     const timeTaken = (endTime.getTime() - submission.startTime.getTime()) / 60000;
@@ -204,15 +208,37 @@ export const submitEssay = async (submission: EssaySubmission): Promise<IEssaySu
     }
 
     let score = 0;
+    const processedAnswers = [];
+    
     for (const answer of submission.answers) {
         const question = assignment.questions.find(q => q._id && q._id.toString() === answer.questionId);
         if (question) {
-        const response = await axios.post('https://sentence-similarity-pi.vercel.app/similarity', {
-            model_answer: answer.modelAnswer,
-            student_answer: answer.studentAnswer
-        });
+            try {
+                const response = await axios.post('https://sentence-similarity-pi.vercel.app/similarity', {
+                    model_answer: answer.modelAnswer,
+                    student_answer: answer.studentAnswer
+                });
 
-        score += response.data.similarity_score;
+                // Add similarity score to processed answer
+                const processedAnswer = {
+                    questionId: new mongoose.Types.ObjectId(answer.questionId),
+                    modelAnswer: answer.modelAnswer,
+                    studentAnswer: answer.studentAnswer,
+                    similarityScore: response.data.similarity_score
+                };
+                
+                processedAnswers.push(processedAnswer);
+                score += response.data.similarity_score;
+            } catch (error) {
+                console.error('Error calculating similarity:', error);
+                // Add answer without similarity score
+                processedAnswers.push({
+                    questionId: new mongoose.Types.ObjectId(answer.questionId),
+                    modelAnswer: answer.modelAnswer,
+                    studentAnswer: answer.studentAnswer,
+                    similarityScore: 0
+                });
+            }
         }
     }
 
@@ -220,11 +246,7 @@ export const submitEssay = async (submission: EssaySubmission): Promise<IEssaySu
         assignmentId: new mongoose.Types.ObjectId(submission.assignmentId),
         userId: new mongoose.Types.ObjectId(submission.userId),
         registrationNumber,
-        answers: submission.answers.map(answer => ({
-            questionId: new mongoose.Types.ObjectId(answer.questionId),
-            modelAnswer: answer.modelAnswer,
-            studentAnswer: answer.studentAnswer
-        })),
+        answers: processedAnswers,
         score,
         timeTaken,
         submittedAt: endTime,
@@ -260,4 +282,132 @@ export const getEssaySubmissionsByUser = async (userId: string): Promise<IEssayS
  */
 export const getEssaySubmissionsByAssignment = async (assignmentId: string): Promise<IEssaySubmission[]> => {
     return await EssaySubmissionModel.find({assignmentId});
+};
+
+export const getEssayResultsService = async (assignmentId: string) => {
+    // Validate assignmentId
+    if (!mongoose.Types.ObjectId.isValid(assignmentId)) {
+        throw new Error('Invalid assignment ID');
+    }
+
+    // Aggregate results with user details
+    const results = await EssaySubmissionModel.aggregate([
+        // Match submissions for the specific assignment
+        { 
+            $match: { 
+                assignmentId: new mongoose.Types.ObjectId(assignmentId) 
+            } 
+        },
+        // Lookup user details
+        {
+            $lookup: {
+                from: 'users', // Assuming the user collection is named 'users'
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'userDetails'
+            }
+        },
+        // Unwind the user details
+        {
+            $unwind: {
+                path: '$userDetails',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        // Project the desired fields
+        {
+            $project: {
+                _id: 1,
+                registrationNumber: '$registrationNumber',
+                score: 1,
+                timeTaken: 1,
+                userId: 1,
+                submittedAt: 1,
+                studentName: '$userDetails.name', // Assuming the user model has a 'name' field
+                essayAnswer: { $arrayElemAt: ['$answers.studentAnswer', 0] }, // Get first answer if multiple
+                similarityScore: { $arrayElemAt: ['$answers.similarityScore', 0] } // Get first similarity score
+            }
+        },
+        // Sort by score in descending order
+        {
+            $sort: { score: -1 }
+        }
+    ]);
+
+    return {
+        success: true,
+        results: results
+    };
+};
+
+/**
+ * Get violation summary for a specific assignment
+ * @param assignmentId - ID of the essay assignment
+ * @returns Object containing violation summary
+ */
+export const getEssayViolationSummaryService = async (assignmentId: string) => {
+    // Validate assignmentId
+    if (!mongoose.Types.ObjectId.isValid(assignmentId)) {
+        throw new Error('Invalid assignment ID');
+    }
+
+    // Aggregate violations with user details
+    const summary = await EssaySubmissionModel.aggregate([
+        // Match submissions for the specific assignment
+        { 
+            $match: { 
+                assignmentId: new mongoose.Types.ObjectId(assignmentId) 
+            } 
+        },
+        // Lookup user details
+        {
+            $lookup: {
+                from: 'users', // Assuming the user collection is named 'users'
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'userDetails'
+            }
+        },
+        // Unwind the user details
+        {
+            $unwind: {
+                path: '$userDetails',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        // Group by student and count violations
+        {
+            $group: {
+                _id: '$userId',
+                studentName: { $first: '$userDetails.name' },
+                totalViolations: { $sum: 1 }, // You might want to adjust this based on your violation tracking
+                violationTypes: { $addToSet: 'Similarity Violation' } // Example violation type
+            }
+        },
+        // Sort by total violations in descending order
+        {
+            $sort: { totalViolations: -1 }
+        }
+    ]);
+
+    return {
+        success: true,
+        summary: summary
+    };
+};
+/**
+ * Get a specific student's essay submission for an assignment
+ * @param assignmentId - Essay assignment ID
+ * @param studentId - Student ID
+ * @returns The student's essay submission or null if not found
+ */
+export const getStudentEssaySubmission = async (assignmentId: string, studentId: string): Promise<IEssaySubmission | null> => {
+    if (!mongoose.Types.ObjectId.isValid(assignmentId) || !mongoose.Types.ObjectId.isValid(studentId)) {
+        throw new Error('Invalid ID format');
+    }
+    
+    return await EssaySubmissionModel.findOne({
+        assignmentId: new mongoose.Types.ObjectId(assignmentId),
+        userId: new mongoose.Types.ObjectId(studentId)
+    });
 };
