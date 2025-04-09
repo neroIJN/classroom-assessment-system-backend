@@ -52,6 +52,7 @@ export interface IAssignment extends Document {
   createdAt: Date;
   updatedAt: Date;
   guidelines: string[];
+  intendedBatch: number;
   password: string;
   startDate: Date; // Start date for the assignment
   endDate: Date;   // End date for the assignment
@@ -96,6 +97,10 @@ const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
+    },
+    intendedBatch: {
+      type: Number,
+      required: [true, "Intended batch is required"],
     },
     startDate: {
       type: Date,
