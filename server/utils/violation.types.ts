@@ -6,6 +6,7 @@ export type ViolationType =
   | 'Window Switch'
   | 'Mouse Exit'
   | 'Keyboard Shortcut'
+  | 'Copy Paste'
   | 'Right Click'
   | 'Fullscreen Exit';
 
@@ -30,4 +31,17 @@ export interface ICreateViolationDto {
     count?: number;
     key?: string;
   };
+}
+export interface IViolationDetails {
+  type: ViolationType;
+  timestamp: Date;
+  count?: number;
+  key?: string;
+}
+
+export interface IViolation extends Document {
+  studentId: Types.ObjectId;
+  quizId: Types.ObjectId;
+  violation: IViolationDetails;
+  createdAt: Date;
 }

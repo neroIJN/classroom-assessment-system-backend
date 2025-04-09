@@ -20,6 +20,7 @@ export class ViolationMiddleware {
         'Window Switch',
         'Mouse Exit',
         'Keyboard Shortcut',
+        'Copy Paste',
         'Right Click',
         'Fullscreen Exit'
       ];
