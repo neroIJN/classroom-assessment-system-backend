@@ -66,4 +66,23 @@ export class ViolationController {
       });
     }
   };
+  getLiveViolations = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { quizId } = req.params;
+      const timeWindow = parseInt(req.query.timeWindow as string) || 30; // Default to 30 minutes
+      
+      const violations = await this.violationService.getLiveViolations(quizId, timeWindow);
+
+      res.status(200).json({
+        success: true,
+        violations
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch live violations',
+        error: (error instanceof Error) ? error.message : 'Unknown error'
+      });
+    }
+  };
 }
