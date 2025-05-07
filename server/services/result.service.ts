@@ -77,7 +77,10 @@ export const getAssignmentViolationStats = async (assignmentId: string) => {
       violationsByType: {}
     };
   } catch (error) {
-    throw new Error(`Failed to fetch violation statistics: ${error.message}`);
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch violation statistics: ${error.message}`);
+    }
+    throw new Error('Failed to fetch violation statistics due to an unknown error');
   }
 };
 /**
@@ -101,6 +104,9 @@ export const getStudentEssayViolations = async (assignmentId: string, studentId:
     return violations;
   } catch (error) {
     console.error('Error fetching student essay violations:', error);
-    throw new Error(`Failed to fetch student violations: ${error.message}`);
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch student violations: ${error.message}`);
+    }
+    throw new Error('Failed to fetch student violations due to an unknown error');
   }
 };

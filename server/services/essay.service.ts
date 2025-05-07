@@ -140,6 +140,7 @@ export const addEssayItem = async (
 interface EssaySubmission {
     assignmentId: string;
     userId: string;
+    registrationNumber?: string; // Added registrationNumber as an optional property
     answers: { questionId: string; modelAnswer: string; studentAnswer: string }[];
     startTime: Date;
 }

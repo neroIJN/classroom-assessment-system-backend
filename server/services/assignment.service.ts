@@ -170,7 +170,7 @@ export const submitQuiz = async (submission: QuizSubmission): Promise<IQuizSubmi
     }
 
     // Try different possible locations of the question text
-    const questionText = question.question || question.questionText || question.text;
+    const questionText = question.questionText;
     if (!questionText) {
       console.log('Question object structure:', question);
       throw new ErrorHandler(`Question text not found in structure for question ${answer.questionId}`, 400);
@@ -185,7 +185,7 @@ export const submitQuiz = async (submission: QuizSubmission): Promise<IQuizSubmi
     }
 
     // Try different possible locations of the option text
-    const optionText = selectedOption.option || selectedOption.optionText || selectedOption.text;
+    const optionText = selectedOption.text;
     if (!optionText) {
       console.log('Option object structure:', selectedOption);
       throw new ErrorHandler(`Option text not found in structure for option ${answer.selectedOption}`, 400);

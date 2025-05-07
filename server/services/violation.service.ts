@@ -29,7 +29,7 @@ export class ViolationService {
       return await ViolationModel.find({ quizId: new Types.ObjectId(quizId) });
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch violations: ${error.message}`);
+        throw new Error(`Failed to fetch violations: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
       throw error;
     }
@@ -41,7 +41,10 @@ export class ViolationService {
         studentId: new Types.ObjectId(studentId)
       }).sort({ 'violation.timestamp': 1 });
     } catch (error) {
-      throw new Error(`Failed to fetch violations: ${error.message}`);
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch violations: ${error.message}`);
+      }
+      throw error;
     }
   }
 

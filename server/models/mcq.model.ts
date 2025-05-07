@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
 const mcqOptionSchema: Schema = new mongoose.Schema({
   text: {
@@ -33,11 +33,13 @@ const mcqQuestionSchema: Schema = new mongoose.Schema({
 });
 
 export interface IMCQOption extends Document {
+  _id: Types.ObjectId;
   text: string;
   isCorrect: boolean;
 }
 
 export interface IMCQQuestion extends Document {
+  _id: Types.ObjectId;
   questionText: string;
   options: IMCQOption[];
   pointsForQuestion: number; // for give different points per question
