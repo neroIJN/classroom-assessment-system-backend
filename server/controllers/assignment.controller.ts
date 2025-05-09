@@ -14,6 +14,7 @@ import {
   getQuizSubmissionsByUser,
   getQuizSubmissionsByAssignment,
   updateScore,
+  updateAttemptedStudentsService,
 } from '../services/assignment.service';
 import { IAssignment } from '../models/mcq.model';
 
@@ -262,6 +263,35 @@ export const calculateScoreController = async (req: Request, res: Response, next
     res.status(200).json({
       success: true,
       score
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// update attempted students
+export const updateAttemptedStudentsController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { assignmentId, studentId } = req.body;
+    const assignment = await updateAttemptedStudentsService(assignmentId, studentId);
+    // const assignment = await getAssignmentById(assignmentId);
+    // if (!assignment) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: 'Assignment not found',
+    //   });
+    // }
+    // if (!assignment.attemptedStudents.includes(studentId)) {
+    //   assignment.attemptedStudents.push(studentId);
+    //   await assignment.save();
+    // }
+    // res.status(200).json({
+    //   success: true,
+    //   attemptedStudents: assignment.attemptedStudents,
+    // });
+    return res.status(200).json({
+      success: true,
+      attemptedStudents: assignment.attemptedStudents,
     });
   } catch (error) {
     next(error);

@@ -16,10 +16,12 @@ import {
   getEssayResultsController,
   getEssayViolationSummaryController,
   getStudentEssayViolationsController,
-  getStudentEssayResultController
+  getStudentEssayResultController,
+  updateEssayAttemptedStudentsController
 } from '../controllers/essay.controller';
 import { checkEssayAssignmentExists } from '../middleware/essay.middleware';
 import { isAuthenticated } from '../middleware/auth';
+import { updateAttemptedStudentsController } from '../controllers/assignment.controller';
 
 const essayRouter = express.Router();
 
@@ -64,5 +66,8 @@ essayRouter.get('/essay/submissions/user/:userId', getEssaySubmissionsByUserCont
 
 // Get all essay submissions for an assignment
 essayRouter.get('/essay/:id/submissions', getEssaySubmissionsByAssignmentController);
+
+//update attempted students
+essayRouter.put('/essay/:id/attemptedStudents', checkEssayAssignmentExists, updateEssayAttemptedStudentsController);
 
 export default essayRouter;

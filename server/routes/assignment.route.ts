@@ -10,6 +10,7 @@ import {
   getQuizSubmissionController,
   getQuizSubmissionsByUserController,
   getQuizSubmissionsByAssignmentController,
+  updateAttemptedStudentsController,
 } from '../controllers/assignment.controller';
 import { checkAssignmentExists } from '../middleware/assignment.middleware';
 import { isAuthenticated,authorizeRoles } from '../middleware/auth';
@@ -45,5 +46,8 @@ router.get('/submissions/user/:userId', getQuizSubmissionsByUserController);
 
 // Get all quiz submissions for an assignment
 router.get('/:id/submissions', getQuizSubmissionsByAssignmentController);
+
+// update attempted students
+router.put('/:id/attemptedStudents', checkAssignmentExists, updateAttemptedStudentsController);
 
 export default router;

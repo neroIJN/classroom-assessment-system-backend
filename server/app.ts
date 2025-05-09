@@ -16,7 +16,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001','http://47.128.238.249:3001' ,'http://47.128.238.249:3000' ], // Allow requests from localhost:3000
+    origin: ['http://localhost:3000', 'http://localhost:3001','http://47.128.238.249:3001' ,'http://47.128.238.249:3000', 'https://assignment-sys-frontend-adhthbh1s-kavindudrs-projects.vercel.app', 'https://software-project-admin-gdmu44bay-kavindudrs-projects.vercel.app' ], // Allow requests from localhost:3000
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // If you're using cookies or authentication
     allowedHeaders: ['Content-Type', 'Authorization'],

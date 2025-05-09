@@ -412,3 +412,21 @@ export const getStudentEssaySubmission = async (assignmentId: string, studentId:
         userId: new mongoose.Types.ObjectId(studentId)
     });
 };
+
+// update attempted students
+export const updateEssayAttemptedStudentsService = async (assignmentId: string, studentId: string): Promise<IEssayAssignment> => {
+    const assignment = await EssayAssignmentModel.findById(assignmentId);
+    if (!assignment) {
+        throw new ErrorHandler('Assignment not found', 404);
+    }
+    const updatedAssignment = await EssayAssignmentModel.findByIdAndUpdate(
+        assignmentId,
+        { $addToSet: { attemptedStudents: studentId } },
+        { new: true }
+    );
+    if (!updatedAssignment) {
+        throw new ErrorHandler('Failed to update attempted students', 500);
+    }
+    console.log(`Student ${studentId} has been added to attempted students for assignment ${assignmentId}.`);
+    return updatedAssignment;
+};

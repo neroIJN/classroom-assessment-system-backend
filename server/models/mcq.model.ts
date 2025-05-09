@@ -58,6 +58,7 @@ export interface IAssignment extends Document {
   password: string;
   startDate: Date; // Start date for the assignment
   endDate: Date;   // End date for the assignment
+  attemptedStudents: mongoose.Schema.Types.ObjectId[]; // Array of student IDs who attempted the assignment
 }
 
 const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
@@ -111,6 +112,11 @@ const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
     endDate: {
       type: Date,
       required: [true, "End date is required"],
+    },
+    attemptedStudents: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [], // Initialize with an empty array
     },
   },
   { timestamps: true }

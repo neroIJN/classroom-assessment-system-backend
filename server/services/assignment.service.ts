@@ -228,3 +228,22 @@ export const getQuizSubmissionsByUser = async (userId: string): Promise<IQuizSub
 export const getQuizSubmissionsByAssignment = async (assignmentId: string): Promise<IQuizSubmission[]> => {
   return await QuizSubmissionModel.find({ assignmentId });
 };
+
+export const updateAttemptedStudentsService = async (assignmentId: string, studentId: string): Promise<IAssignment> => {
+  
+  const assignment = await AssignmentModel.findById(assignmentId);
+  if (!assignment) {
+    throw new ErrorHandler('Assignment not found', 404);
+  }
+  const updatedAssignment = await AssignmentModel.findByIdAndUpdate(
+    assignmentId,
+    { $addToSet: { attemptedStudents: studentId } },
+    { new: true }
+  );
+  
+
+  console.log(`Student ${studentId} has been added to attempted students for assignment ${assignmentId}.`);
+  // Optionally, you can also return the updated assignment if needed
+  
+  return updatedAssignment as IAssignment;
+}
