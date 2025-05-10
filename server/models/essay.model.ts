@@ -28,6 +28,7 @@ export interface IEssayAssignment extends Document {
     timeLimit: number; // Time limit in minutes
     startDate: Date;   // Start date for the assignment
     endDate: Date;     // End date for the assignment
+    attemptedStudents: mongoose.Schema.Types.ObjectId[]; // Array of student IDs who attempted the assignment
     createdAt: Date;
     updatedAt: Date;
 }
@@ -83,6 +84,11 @@ const essayAssignmentSchema: Schema<IEssayAssignment> = new mongoose.Schema(
         endDate: {
             type: Date,
             required: [true, "End date is required"],
+        },
+        attemptedStudents: {
+            type: [mongoose.Schema.Types.ObjectId],
+            ref: "User",
+            default: [],
         },
     },
     { timestamps: true }

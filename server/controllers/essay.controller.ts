@@ -16,7 +16,8 @@ import {
     getPastEssays,
     getEssayResultsService,
     getEssayViolationSummaryService,
-    getStudentEssaySubmission
+    getStudentEssaySubmission,
+    updateEssayAttemptedStudentsService
 } from "../services/essay.service";
 import EssayAssignmentModel from "../models/essay.model";
 import { ErrorHandler } from "../utils/ErrorHandler";
@@ -367,3 +368,22 @@ export const getStudentEssayResultController = async (
     ));
   }
 };
+
+export const updateEssayAttemptedStudentsController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { assignmentId, studentId } = req.body;
+
+    // Check if the assignment exists
+    const assignment = await updateEssayAttemptedStudentsService(assignmentId, studentId);
+    res.status(200).json({
+      success: true,
+      message: "Attempted students updated successfully",
+      assignment
+    });
+  } catch (error) {
+    next(new ErrorHandler(
+      error instanceof Error ? error.message : 'Failed to update attempted students', 
+      500
+    ));
+  }
+}

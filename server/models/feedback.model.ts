@@ -1,7 +1,7 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IFeedback extends Document {
-    _id: mongoose.Schema.Types.ObjectId;
+    // _id: mongoose.Schema.Types.ObjectId;
     assignmentId: mongoose.Schema.Types.ObjectId;
     feedback: string;
     createdAt: Date;

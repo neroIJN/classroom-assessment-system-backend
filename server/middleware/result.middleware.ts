@@ -1,4 +1,13 @@
 import { Request, Response, NextFunction } from "express";
+
+// Extend the Request interface to include the 'result' property
+declare global {
+  namespace Express {
+    interface Request {
+      result?: any;
+    }
+  }
+}
 import mongoose from "mongoose";
 import ResultModel from "../models/result.model";
 import { ErrorHandler } from "../utils/ErrorHandler";

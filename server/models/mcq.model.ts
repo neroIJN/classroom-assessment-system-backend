@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
 const mcqOptionSchema: Schema = new mongoose.Schema({
   text: {
@@ -33,11 +33,13 @@ const mcqQuestionSchema: Schema = new mongoose.Schema({
 });
 
 export interface IMCQOption extends Document {
+  _id: Types.ObjectId;
   text: string;
   isCorrect: boolean;
 }
 
 export interface IMCQQuestion extends Document {
+  _id: Types.ObjectId;
   questionText: string;
   options: IMCQOption[];
   pointsForQuestion: number; // for give different points per question
@@ -56,6 +58,7 @@ export interface IAssignment extends Document {
   password: string;
   startDate: Date; // Start date for the assignment
   endDate: Date;   // End date for the assignment
+  attemptedStudents: mongoose.Schema.Types.ObjectId[]; // Array of student IDs who attempted the assignment
 }
 
 const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
@@ -109,6 +112,11 @@ const assignmentSchema: Schema<IAssignment> = new mongoose.Schema(
     endDate: {
       type: Date,
       required: [true, "End date is required"],
+    },
+    attemptedStudents: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [], // Initialize with an empty array
     },
   },
   { timestamps: true }
