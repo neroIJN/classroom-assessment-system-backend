@@ -13,6 +13,7 @@ import { isAuthenticated } from '../middleware/auth';
 import { ViolationController } from '../controllers/violation.controller';
 import { startQuizSessionController, heartbeatController, completeQuizSessionController, getQuizStatsController } from '../controllers/QuizTracking.controller';
 import { ViolationMiddleware } from '../middleware/violation.middleware';
+import { createFeedbackController, getFeedbackByAssignmentIdController, getFeedbackByIdController } from '../controllers/feedback.controller';
 const violationController = new ViolationController();
 const violationMiddleware = new ViolationMiddleware();
 const userRouter = express.Router();
@@ -69,6 +70,15 @@ userRouter.get(
 // update whether a student is a repeater or not with repeat batch
 userRouter.put(
   '/update-repeater/:id', isAuthenticated, updateUserRepeatBatch);
+
+// Add a new feedback
+userRouter.post('/feedback/create', isAuthenticated, createFeedbackController);
+
+// Get feedback by id
+userRouter.get('/feedback/:id', getFeedbackByIdController);
+
+// Get feedbacks by assignment id
+userRouter.get('/feedbacks/:assignmentId', getFeedbackByAssignmentIdController);
 
 export default userRouter;
 
