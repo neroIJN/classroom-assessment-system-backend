@@ -1,5 +1,8 @@
-import { downloadExcelSheet, downloadFullExcelSheet } from './../controllers/resultGenerator.controller';
-import express from 'express';
+import {
+  downloadExcelSheet,
+  downloadFullExcelSheet,
+} from "./../controllers/resultGenerator.controller";
+import express from "express";
 import {
   createAssignmentController,
   getAssignmentByIdController,
@@ -12,7 +15,7 @@ import {
   getQuizSubmissionsByUserController,
   getQuizSubmissionsByAssignmentController,
   calculateScoreController,
-} from '../controllers/assignment.controller';
+} from "../controllers/assignment.controller";
 import {
   activateUser,
   getAdminInfo,
@@ -22,125 +25,165 @@ import {
   updateAccessToken,
   updateUserAdminProfileController,
   updateUserPasswordController,
-} from '../controllers/userAdmin.controller';
-import { isAuthenticated, authorizeRoles } from '../middleware/auth';
-import { forgotPassword, verifyResetToken, resetPassword } from '../controllers/auth.controller';
+} from "../controllers/userAdmin.controller";
+import {
+  createMixedAssignment,
+  getMixedAssignments,
+  getMixedAssignmentById,
+} from "../controllers/mixedAssignment.controller";
+
+import { isAuthenticated, authorizeRoles } from "../middleware/auth";
+import {
+  forgotPassword,
+  verifyResetToken,
+  resetPassword,
+} from "../controllers/auth.controller";
 const userAdminRouter = express.Router();
 
 // Admin-specific user management routes
-userAdminRouter.post('/AdminRegistration', registrationUser);
-userAdminRouter.post('/activate-AdminUser', activateUser);
-userAdminRouter.post('/login-AdminUser', loginUser);
-userAdminRouter.get('/logout-AdminUser', isAuthenticated, authorizeRoles('admin'), logoutUser);
-userAdminRouter.get('/refreshAdminToken', updateAccessToken);
-userAdminRouter.get('/meAdmin', isAuthenticated, authorizeRoles('admin'), getAdminInfo);
+userAdminRouter.post("/AdminRegistration", registrationUser);
+userAdminRouter.post("/activate-AdminUser", activateUser);
+userAdminRouter.post("/login-AdminUser", loginUser);
+userAdminRouter.get(
+  "/logout-AdminUser",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  logoutUser
+);
+userAdminRouter.get("/refreshAdminToken", updateAccessToken);
+userAdminRouter.get(
+  "/meAdmin",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  getAdminInfo
+);
+
+// mixed assingnment creation
+userAdminRouter.post(
+  "/createMixedAssignment",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  createMixedAssignment
+);
+userAdminRouter.get(
+  "/getMixedAssignments",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  getMixedAssignments
+);
+userAdminRouter.get(
+  "/:id",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  getMixedAssignmentById
+);
 
 // Assignment management routes
 userAdminRouter.post(
-  '/create-assignment',
+  "/create-assignment",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   createAssignmentController
 );
 userAdminRouter.get(
-  '/assignments/:id',
+  "/assignments/:id",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   getAssignmentByIdController
 );
 userAdminRouter.put(
-  '/assignments/:id',
+  "/assignments/:id",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   updateAssignmentController
 );
 userAdminRouter.delete(
-  '/assignments/:id',
+  "/assignments/:id",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   deleteAssignmentController
 );
 userAdminRouter.get(
-  '/assignments/teacher/:teacherId',
+  "/assignments/teacher/:teacherId",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   getAllAssignmentsController
 );
 
 // Quiz-related routes
 userAdminRouter.post(
-  '/quiz/:id/start',
+  "/quiz/:id/start",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   startQuizController
 );
 userAdminRouter.post(
-  '/quiz/:id/submit',
+  "/quiz/:id/submit",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   submitQuizController
 );
 userAdminRouter.get(
-  '/quiz/submission/:submissionId',
+  "/quiz/submission/:submissionId",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   getQuizSubmissionController
 );
 userAdminRouter.get(
-  '/quiz/user/:userId/submissions',
+  "/quiz/user/:userId/submissions",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   getQuizSubmissionsByUserController
 );
 userAdminRouter.get(
-  '/quiz/assignment/:id/submissions',
+  "/quiz/assignment/:id/submissions",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   getQuizSubmissionsByAssignmentController
 );
 userAdminRouter.post(
-  '/quiz/:id/calculate-score',
+  "/quiz/:id/calculate-score",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   calculateScoreController
 );
 
 // Result generation routes
 userAdminRouter.get(
-  '/download-excel',
+  "/download-excel",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   downloadExcelSheet
 );
 userAdminRouter.get(
-  '/download-full-excel',
+  "/download-full-excel",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   downloadFullExcelSheet
 );
 
 // User management routes
 // update profile
 userAdminRouter.put(
-  '/update-profile',
+  "/update-profile",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   updateUserAdminProfileController
 );
 
 //update password
 userAdminRouter.put(
-  '/update-password',
+  "/update-password",
   isAuthenticated,
-  authorizeRoles('admin'),
+  authorizeRoles("admin"),
   updateUserPasswordController
-)
+);
 
 // Password reset routes
 
-userAdminRouter.post('/forgot-password', forgotPassword);
-userAdminRouter.get('/verify-reset-token', verifyResetToken);
-userAdminRouter.post('/reset-password', resetPassword);
+userAdminRouter.post("/forgot-password", forgotPassword);
+userAdminRouter.get("/verify-reset-token", verifyResetToken);
+userAdminRouter.post("/reset-password", resetPassword);
 
 // Refresh access token
 

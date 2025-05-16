@@ -10,6 +10,7 @@ import router from './routes/assignment.route';
 import resultRouter from './routes/result.routes';
 import structurerouter from './routes/structure.route';
 import essayRouter from './routes/essay.route';
+import mixedAssignmentRoutes from './routes/mixedAssignment.routes';
 // import feedbackRouter from './routes/feedback.route';
 
 app.use(express.json({ limit: "50mb" }));
